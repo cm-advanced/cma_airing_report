@@ -1,0 +1,9 @@
+name = Community Media Advanced Airing Report
+package = Community Media Advanced
+description = "Helper functions for airing reports"
+version 7.x-1.0
+
+core = 7.x
+
+dependencies[] = cm_airing
+

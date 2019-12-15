@@ -1,0 +1,1225 @@
+<?php
+
+function cma_airing_report_views_api() {
+  return array(
+               'api' => 3,
+               'path' =>
+               drupal_get_path('module',
+                               'cma_airing_report').'/inc'
+               );
+}
+
+function cma_airing_report_menu() {
+  $items = array();
+
+  $items['admin/airings/manage/reports'] = 
+    array(
+	  'title' => t('Airing Reports'),
+	  'page callback' => 'cma_airing_report_menu_page',
+	  'access arguments' => array('view cm_airing entities'),
+	  'type' => MENU_NORMAL_ITEM,
+	  );
+  
+  return $items;
+}
+
+function cma_airing_report_menu_page() {
+  $ret = "";
+  $ret .= "<ul>";
+
+  $ret .= "<li>";
+  $ret .= l(t("Distribution Reports"), 
+	      "admin/airings/reports/distribution");
+  $ret .= "</li>";
+
+  $ret .= "<li>";
+  $ret .= l(t("Refresh Show Runtimes"), 
+	      "admin/shows/refresh-runtimes");
+  $ret .= "</li>";
+
+  $ret .= "</ul>";
+
+  return $ret;
+}
+
+function cma_airing_report_distribution_fields() {
+  return 
+    array(
+	  array('name' => 'airing_project_ref',
+		'postfix' => '_target_id',
+		'entity' => 'airing',
+		'table' => 'aproj',
+		'report' => TRUE,
+		'ids' => array(1532, 6563, 6564, 6565),
+		'children' => array('is_show_premiere_date', 'airing_channel'),
+		),
+	  array('name' => 'airing_project_ref',
+		'report_only' => TRUE,
+		'report' => TRUE,
+		'postfix' => ' live_source',
+		'ids' => array(1532, 6563, 6564, 6565),
+		'children' => array('is_show_premiere_date', 'live_source',
+				    'airing_channel'),
+
+		),
+
+	  array('name' => 'airing_show_ref',
+		'postfix' => '_target_id',
+		'entity' => 'airing',
+		'table' => 'ashow',
+		'report' => FALSE,
+		),
+	  array('name' => 'airing_channel',
+		'postfix' => '_tid',
+		'entity' => 'airing',
+		'table' => 'ch',
+		'report' => TRUE,
+		),
+	  array('name' => 'airing_date',
+		'postfix' => '_value',
+		'entity' => 'airing',
+		'table' => 'adate',
+		'report' => FALSE,
+		),
+	  array('name' => 'is_show_premiere_date',
+		'postfix' => '_value',
+		'entity' => 'airing',
+		'table' => 'ashow_premiere',
+		'report' => TRUE,
+		'children' => array('airing_channel'),
+		),
+	  array('name' => 'is_show_premiere_date',
+		'report_only' => TRUE,
+		'report' => TRUE,
+		'postfix' => ' government_channel',
+		'ids' => array(1532, 6563, 6564, 6565),
+		'children' => array('airing_channel'),
+
+		),
+	  array('name' => 'is_show_premiere_date',
+		'report_only' => TRUE,
+		'report' => TRUE,
+		'postfix' => ' pcm_facilities',
+		'children' => array('pcm_facilities', 'airing_channel'),
+		),
+	  array('name' => 'is_show_premiere_date',
+		'report_only' => TRUE,
+		'report' => TRUE,
+		'postfix' => ' pbcore_genres',
+		'children' => array('pbcore_genres'),
+		),
+	  array('name' => 'is_show_premiere_date',
+		'report_only' => TRUE,
+		'report' => TRUE,
+		'postfix' => ' live_source',
+		'children' => array('live_source'),
+		),
+	  array('name' => 'is_show_premiere_date',
+		'report_only' => TRUE,
+		'report' => TRUE,
+		'postfix' => ' pcm_facilities live_source',
+		'children' => array('pcm_facilities', 'live_source', 
+				    'airing_channel'),
+		),
+	  array('name' => 'is_show_premiere_date',
+		'report_only' => TRUE,
+		'report' => TRUE,
+		'postfix' => ' produced_where',
+		'children' => array('produced_where', 'airing_channel'),
+		),
+	  array('name' => 'is_show_premiere_date',
+		'report_only' => TRUE,
+		'report' => TRUE,
+		'postfix' => ' produced_where live_source',
+		'children' => array('produced_where', 'live_source', 
+				    'airing_channel'),
+		),
+	  array('name' => 'is_show_premiere_date',
+		'report_only' => TRUE,
+		'report' => TRUE,
+		'postfix' => ' produced_city',
+		'children' => array('produced_city', 'airing_channel'),
+		),
+	  array('name' => 'is_show_premiere_date',
+		'report_only' => TRUE,
+		'report' => TRUE,
+		'postfix' => ' produced_city live_source',
+		'children' => array('produced_city', 'live_source', 
+				    'airing_channel'),
+		),
+
+	  array('name' => 'is_show_simul_premiere',
+		'postfix' => '_value',
+		'entity' => 'airing',
+		'table' => 'ashow_simul',
+		'report' => TRUE,
+		),
+
+	  array('name' => 'live_source',
+		'postfix' => '_value',
+		'entity' => 'airing',
+		'table' => 'lsource',
+                'report' => TRUE,
+	        'children' => array(),
+		),
+
+	  array('name' => 'live_source',
+		'report_only' => TRUE,
+		'report' => TRUE,
+		'postfix' => ' airing_channel',
+		'children' => array('airing_channel'),
+		),
+	  array('name' => 'live_source',
+		'report_only' => TRUE,
+		'report' => TRUE,
+		'postfix' => ' produced_where airing_channel',
+		'children' => array('produced_where', 'airing_channel'),
+		),
+	  array('name' => 'live_source',
+		'report_only' => TRUE,
+		'report' => TRUE,
+		'postfix' => ' pcm_facilities airing_channel',
+		'children' => array('pcm_facilities', 'airing_channel'),
+
+		),
+	  array('name' => 'live_source',
+		'report_only' => TRUE,
+		'report' => TRUE,
+		'postfix' => ' produced_city airing_channel',
+		'children' => array('produced_city', 'airing_channel'),
+		),
+
+	  array('name' => 'pbcore_genres',
+		'postfix' => '_tid',
+		'entity' => 'show',
+		'table' => 'spbg',
+		'report' => TRUE,
+		'children' => array('is_show_premiere_date'),
+		),
+	  array('name' => 'premier_date',
+		'postfix' => '_value',
+		'entity' => 'show',
+		'table' => 'pd',
+		'report' => TRUE,
+		),
+	  array('name' => 'produced_where',
+		'postfix' => '_value',
+		'entity' => 'show',
+		'table' => 'pw',
+		'report' => TRUE,
+		'children' => array('airing_channel'),
+		),
+	  array('name' => 'produced_city',
+		'postfix' => '_value',
+		'entity' => 'show',
+		'table' => 'city',
+		'report' => TRUE,
+		'children' => array('airing_channel'),
+		),
+	  array('name' => 'pcm_facilities',
+		'postfix' => '_value',
+		'entity' => 'show',
+		'table' => 'facil',
+		'report' => TRUE,
+		'children' => array('airing_channel'),
+		),
+
+	  array('name' => 'produced_where',
+		'report_only' => TRUE,
+		'report' => TRUE,
+		'postfix' => ' live_source',
+		'children' => array('is_show_premiere_date', 'live_source',
+				    'airing_channel'),
+		),
+	  array('name' => 'produced_city',
+		'report_only' => TRUE,
+		'report' => TRUE,
+		'postfix' => ' live_source',
+		'children' => array('is_show_premiere_date', 'live_source',
+				    'airing_channel'),
+		),
+	  array('name' => 'pcm_facilities',
+		'report_only' => TRUE,
+		'report' => TRUE,
+		'postfix' => ' live_source',
+		'children' => array('is_show_premiere_date', 'live_source',
+				    'airing_channel'),
+		),
+
+	  array('name' => 'runtime',
+		'postfix' => '_value',
+		'entity' => 'show',
+		'table' => 'rt',
+		'report' => FALSE,
+		),
+	  array('name' => 'pbcore_genres',
+		'postfix' => '_tid',
+		'entity' => 'project',
+		'table' => 'ppbg',
+		'report' => FALSE,
+		),
+	 
+	  );
+
+}
+/**
+ * Initializes a sum for report totals
+ */
+function cma_airing_report_initialize_sum($sum) {
+  if (isset($sum)) {
+    return $sum;
+  }
+  return 0;
+}
+
+/**
+ * Initializes an array for sub report
+ */
+function cma_airing_report_initialize_array($array) {
+  if (isset($array)) {
+    return $array;
+  }
+  return array();
+}
+/**
+ * Provides the header for admin/airings/reports/distribution
+ */
+function cma_airing_report_distribution_header() {
+  $view = views_get_current_view();
+  $count_query = $view->build_info['count_query'];
+  $exposed_input = $view->exposed_input;
+
+  $query_args = $count_query->getArguments();
+  $fields = cma_airing_report_distribution_fields();
+
+  $sql = 'SELECT ';
+  $is_first = TRUE;
+  foreach($fields as $field_info) {
+    if (isset($field_info['report_only']) && $field_info['report_only']) {
+      continue;
+    }
+    if (!$is_first) {
+      $sql .= ', ';
+    } 
+    $sql .= $field_info['table'] . '.field_' . $field_info['name'] . 
+      $field_info['postfix'] .' as ' . $field_info['name'];
+
+    $is_first = FALSE;    
+  }
+
+  $sql .= ' FROM cm_airing airing ';
+
+  foreach($fields as $field_info) {
+    if (isset($field_info['report_only']) && $field_info['report_only']) {
+      continue;
+    }
+    if ($field_info['entity'] == 'airing') {
+      $sql .= 
+	'LEFT JOIN field_data_field_' . $field_info['name'] . ' ' .
+	$field_info['table'] . ' ON airing.airing_id=' . $field_info['table']. 
+	'.entity_id';
+    }
+    else if ($field_info['entity'] == 'show') {
+      $sql .= 
+	'LEFT JOIN field_data_field_' . $field_info['name'] . ' ' .
+	$field_info['table'] . 
+	' ON ashow.field_airing_show_ref_target_id=' . 
+	$field_info['table'] . '.entity_id';
+    }    
+    else if ($field_info['entity'] == 'project') {
+      $sql .= 
+	'LEFT JOIN field_data_field_' . $field_info['name'] . ' ' . 
+	$field_info['table'] . 
+	' ON aproj.field_airing_project_ref_target_id=' . 
+	$field_info['table'] . '.entity_id';
+    }
+    $sql .= ' ';
+  }
+
+  $start =$query_args[':field_data_field_airing_date_field_airing_date_value'];
+  $end = $query_args[':field_data_field_airing_date_field_airing_date_value1'];
+  $sql .= " WHERE adate.field_airing_date_value >= '$start'";
+  $sql .= " AND adate.field_airing_date_value <= '$end'";
+
+  $results = db_query($sql);
+  $counter = 0;
+
+  $report = array();
+  $limit = 0;
+
+  while($result = $results->fetchObject()) {
+    $report['count'] = cma_airing_report_initialize_sum($report['count']);
+    $report['time'] = cma_airing_report_initialize_sum($report['time']);
+    $report['count']++;
+    $report['time'] += $result->runtime;
+
+    foreach($fields as $field_info) {
+      if ($field_info['report']) {
+	if (isset($field_info['ids']) && $field_info['ids']) {
+	  $has_right_id = FALSE;
+	  foreach($field_info['ids'] as $id) {
+	    if ($id == $result->airing_project_ref) {
+	      $has_right_id = TRUE;
+	      break;
+	    }
+	  }
+	  if (!$has_right_id) {
+	    continue;
+	  }
+	}
+	$name = $field_info['name'];
+	$value = $result->{$name};
+
+	if (isset($field_info['report_only']) && $field_info['report_only']) {
+	  $name .= $field_info['postfix'];
+	}
+
+	$value = ($value == '') ? -1 : $value;
+	$child = $grandchild = $ggchild =  NULL;
+	if (isset($field_info['children'])) {
+	  $child = array_shift($field_info['children']);
+	  if ($child) {
+	    $grandchild = array_shift($field_info['children']);
+	  }
+	  if ($grandchild) {
+	     $ggchild = array_shift($field_info['children']);
+	  }
+	}
+
+	$report[$name] = cma_airing_report_initialize_array($report[$name]);
+
+	$report[$name]['count'] = 
+	  cma_airing_report_initialize_sum($report[$name]['count']);
+
+	$report[$name]['time'] = 
+	  cma_airing_report_initialize_sum($report[$name]['time']);
+
+	$report[$name]['count']++;
+	$report[$name]['time'] += $result->runtime;
+
+	$report[$name][$value] = 
+	  cma_airing_report_initialize_array($report[$name][$value]);
+	
+	$report[$name][$value]['count'] =
+	  cma_airing_report_initialize_sum($report[$name][$value]['count']);
+
+	$report[$name][$value]['time'] = 
+	  cma_airing_report_initialize_sum($report[$name][$value]['time']);
+		
+	$report[$name][$value]['count']++;
+	$report[$name][$value]['time'] += $result->runtime;
+
+	if ($child) {
+	  $cvalue = $result->{$child};
+	  $cvalue = ($cvalue == '') ? -1 : $cvalue;
+	  $report[$name][$value][$child] = 
+	    cma_airing_report_initialize_array($report[$name][$value]
+					       [$child]);
+	  
+	  $report[$name][$value][$child]['count'] =
+	    cma_airing_report_initialize_sum($report[$name][$value]
+					       [$child]['count']);
+	  
+	  $report[$name][$value][$child]['time'] = 
+	    cma_airing_report_initialize_sum($report[$name][$value][$child]
+					     ['time']);
+	  
+	  $report[$name][$value][$child]['count']++;
+	  $report[$name][$value][$child]['time'] += $result->runtime;
+
+	  $report[$name][$value][$child][$cvalue] = 
+	    cma_airing_report_initialize_array($report[$name][$value]
+					       [$child][$cvalue]);
+	  
+	  $report[$name][$value][$child][$cvalue]['count'] =
+	    cma_airing_report_initialize_sum($report[$name][$value]
+					       [$child][$cvalue]['count']);
+	  
+	  $report[$name][$value][$child][$cvalue]['time'] = 
+	    cma_airing_report_initialize_sum($report[$name][$value][$child]
+					     [$cvalue]['time']);
+	  
+	  $report[$name][$value][$child][$cvalue]['count']++;
+	  $report[$name][$value][$child][$cvalue]['time'] += $result->runtime;
+	  
+	}
+	if ($grandchild) {
+	  $gvalue = $result->{$grandchild};
+	  $gvalue = ($gvalue == '') ? -1 : $gvalue;
+	  $report[$name][$value][$child][$cvalue][$grandchild] = 
+	    cma_airing_report_initialize_array($report[$name][$value]
+					       [$child][$cvalue][$grandchild]);
+	  
+	  $report[$name][$value][$child][$cvalue][$grandchild]['count'] =
+	    cma_airing_report_initialize_sum($report[$name][$value]
+					       [$child][$cvalue][$grandchild]
+					     ['count']);
+	  
+	  $report[$name][$value][$child][$cvalue][$grandchild]['time'] = 
+	    cma_airing_report_initialize_sum($report[$name][$value][$child]
+					     [$cvalue][$grandchild]
+					     ['time']);
+	  
+	  $report[$name][$value][$child][$cvalue][$grandchild]['count']++;
+	  $report[$name][$value][$child][$cvalue][$grandchild]['time'] += 
+	    $result->runtime;
+
+	  $report[$name][$value][$child][$cvalue][$grandchild][$gvalue] = 
+	    cma_airing_report_initialize_array($report[$name][$value]
+					       [$child][$cvalue][$grandchild]
+					       [$gvalue]);
+	  
+	  $report[$name][$value][$child][$cvalue][$grandchild][$gvalue]
+	    ['count'] =
+	    cma_airing_report_initialize_sum($report[$name][$value]
+					     [$child][$cvalue][$grandchild]
+					     [$gvalue]['count']);
+	  
+	  $report[$name][$value][$child][$cvalue][$grandchild]
+	    [$gvalue]['time'] = 
+	    cma_airing_report_initialize_sum($report[$name][$value][$child]
+					     [$cvalue][$grandchild]
+					     [$gvalue]['time']);
+	  
+	  $report[$name][$value][$child][$cvalue][$grandchild][$gvalue]
+	    ['count']++;
+	  $report[$name][$value][$child][$cvalue][$grandchild][$gvalue]['time']
+	    += $result->runtime;
+	  
+	}
+	
+	if ($ggchild) {
+
+	  $ggvalue = $result->{$ggchild};
+	  $ggvalue = ($ggvalue == '') ? -1 : $ggvalue;
+	  $report[$name][$value][$child][$cvalue][$grandchild][$gvalue]
+	    [$ggchild] = 
+	    cma_airing_report_initialize_array($report[$name][$value]
+					       [$child][$cvalue][$grandchild]
+					       [$gvalue][$ggchild]);
+	  
+	  $report[$name][$value][$child][$cvalue][$grandchild][$gvalue]
+	    [$ggchild]['count'] =
+	    cma_airing_report_initialize_sum($report[$name][$value]
+					     [$child][$cvalue][$grandchild]
+					     [$gvalue][$ggchild]
+					     ['count']);
+	  
+	  $report[$name][$value][$child][$cvalue][$grandchild][$gvalue]
+	    [$ggchild]['time'] = 
+	    cma_airing_report_initialize_sum($report[$name][$value][$child]
+					     [$cvalue][$grandchild][$gvalue]
+					     [$ggchild]
+					     ['time']);
+	  
+	  $report[$name][$value][$child][$cvalue][$grandchild][$gvalue]
+	    [$ggchild]['count']++;
+	  $report[$name][$value][$child][$cvalue][$grandchild][$gvalue]
+	    [$ggchild]['time'] += 
+	    $result->runtime;
+	   	  
+	  $report[$name][$value][$child][$cvalue][$grandchild][$gvalue]
+	    [$ggchild][$ggvalue] = 
+	    cma_airing_report_initialize_array($report[$name][$value][$child]
+					       [$cvalue][$grandchild][$gvalue]
+					       [$ggchild][$ggvalue]);
+					       
+	  $report[$name][$value][$child][$cvalue][$grandchild][$gvalue]
+	    [$ggchild][$ggvalue]['count'] =
+	    cma_airing_report_initialize_sum($report[$name][$value]
+					     [$child][$cvalue][$grandchild]
+					     [$gvalue][$ggchild][$ggvalue]
+					     ['count']);
+	  
+	  $report[$name][$value][$child][$cvalue][$grandchild]
+	    [$gvalue]['time'] = 
+	    cma_airing_report_initialize_sum($report[$name][$value][$child]
+					     [$cvalue][$grandchild]
+					     [$gvalue][$ggchild][$ggvalue]
+					     ['time']);
+
+	  $report[$name][$value][$child][$cvalue][$grandchild][$gvalue]
+	    [$ggchild][$ggvalue]
+	    ['count']++;
+	  $report[$name][$value][$child][$cvalue][$grandchild][$gvalue]
+	    [$ggchild][$ggvalue]['time']
+	    += $result->runtime;
+	  
+	}
+      }
+    }
+    $limit ++;
+    if ($limit > 100000) {
+      break;
+    }
+  }
+  $ret = '';
+
+  $tree = taxonomy_get_tree(12);
+  $channels = array();
+  foreach($tree as $term) {
+    $channels[$term->tid] = $term->name;
+  }
+  asort($channels);
+
+  $tree = taxonomy_get_tree(3);
+  $genres = array();
+  foreach($tree as $term) {
+    $term = taxonomy_term_load($term->tid);
+    $custom_name = 
+      cma_airing_report_get_single_field_value($term,
+					       'field_pbcore_custom_name');
+
+    if ($custom_name) {
+      $name = $custom_name;
+    }
+    else {
+      $name = $term->name;
+    }
+
+
+    if (isset($report['pbcore_genres'][$term->tid])) {
+      $genres[$term->tid] = $name;
+    }
+  }
+  asort($genres);
+
+  $all_fields = field_info_fields();
+
+  $values= list_allowed_values($all_fields["field_live_source"]);
+  foreach($values as $id=>$value) {
+    if (isset($report['live_source'][$id])) {
+      $live_sources[$id] = $value;
+    }
+  }
+  asort($live_sources);
+
+  /////////////////////////////////////////////////////////////////////////
+  //TOTAL PREMIERES AND REPEATS BY CHANNEL
+  $args = array(
+		'title' => "TOTAL SHOW PREMIERES AND REPEATS BY CHANNEL",
+		'categories' => array('First Run Shows', 'Repeat Shows'),
+		'pname' => 'is_show_premiere_date',
+		'pvalues' => array(1,0),
+		'cname' => 'airing_channel',
+		'type' => 'count',
+		'cvalue' => NULL,
+		'gname' => NULL,	
+		'gvalue' => NULL,
+		'ggname' => NULL,
+		'ggvalues' => NULL,
+		);
+
+  $ret .= cma_airing_sub_report($args, $report, $channels);
+
+  /////////////////////////////////////////////////////////////////////////
+  //RUNTIMES FOR PREMIERES AND REPEATS RUNTIMES BY CHANNEL
+  $args = array(
+		'title' => 
+		"RUNTIMES FOR PREMIERES AND REPEATS RUNTIMES BY CHANNEL",
+		'categories' => array('First Run Show Runtime', 
+				      'Repeat Show Runtime'),
+		'pname' => 'is_show_premiere_date',
+		'pvalues' => array(1,0),
+		'type' => 'time',
+		'cname' => 'airing_channel',
+		'cvalue' => NULL,
+		'gname' => NULL,	
+		'gvalue' => NULL,
+		'ggname' => NULL,
+		'ggvalues' => NULL,
+		);
+
+  $ret .= cma_airing_sub_report($args, $report, $channels);
+  /////////////////////////////////////////////////////////////////////////
+  $name = "Genres";
+  $pname = 'is_show_premiere_date';
+  $pvalues = array(1,0);
+  $cname = 'pbcore_genres';
+  $cvalue = NULL;
+  $gname = NULL;
+  $gvalue = NULL;
+  $ggname = NULL;
+  $ggvalue = NULL;
+
+  $type = 'count';
+  $title = "TOTAL PREMIERES BY " . strtoupper($name);
+  $report_name = $pname . ' ' . $cname;
+  $categories =  array('First Run Shows', 'Repeat Shows');
+
+  $args = 
+    array('title' => $title, 'categories' => $categories,
+	  'pname' => $report_name, 'pvalues' => $pvalues, 'cname' => $cname, 
+	  'cvalue' => $cvalue,	'gname' => $gname, 'gvalue' => $gvalue, 
+	  'ggname' => $ggname,'ggvalue' => $ggvalue, 'type' => $type);
+  $ret .= cma_airing_sub_report($args, $report, $channels, $genres);
+
+  $args['title'] = "RUNTIME FOR PREMIERES BY " . strtoupper($name);
+  $args['type'] = 'time';
+  $args['categories'] = array('Runtime for First Run Shows',
+			      'Runtime for Repeat Shows');
+
+
+  $ret .= cma_airing_sub_report($args, $report, $channels, $genres);
+  /////////////////////////////////////////////////////////////////////////
+  //TOTAL AREA PREMIERES AND REPEATS BY CHANNEL  
+  $args = array(
+		'title' => 
+		"TOTAL OPSIG PRODUCED PREMIERES AND REPEATS BY CHANNEL",
+		'categories' => array('First Run OpSig Produced Through OpSig',
+ 				      'Repeat Shows Produced Through OpSig'),
+		'pname' => 'is_show_premiere_date pcm_facilities',
+		'pvalues' => array(1,0),
+		'cname' => 'pcm_facilities',
+		'cvalue' => 1,
+		'gname' => 'airing_channel',
+		'gcvalues' => NULL,
+		'ggname' => NULL,
+		'ggvalue' => NULL,
+		'type' => 'count',
+		);
+
+  $ret .= cma_airing_sub_report($args, $report, $channels);
+
+  /////////////////////////////////////////////////////////////////////////
+  //RUNTIME FOR OPSIG PRODUCED PREMIERES AND REPEATS BY CHANNEL",
+  $args = array(
+		'title' => 
+		"RUNTIME FOR OPSIG PRODUCED PREMIERES AND REPEATS BY CHANNEL",
+		'categories' => 
+		array('Runtime for First Run  Produced Through OpSig',
+		      'Runtime for Repeat Shows Produced Through OpSig'),
+		'pname' => 'is_show_premiere_date pcm_facilities',
+		'pvalues' => array(1,0),
+		'cname' => 'pcm_facilities',
+		'cvalue' => 1,
+		'gname' => 'airing_channel',
+		'gcvalues' => NULL,
+		'ggname' => NULL,
+		'ggvalue' => NULL,
+		'type' => 'time',
+		);
+
+  $ret .= cma_airing_sub_report($args, $report, $channels);
+
+  /////////////////////////////////////////////////////////////////////////
+  //TOTAL METROPOLITAN AREA PREMIERES AND REPEATS BY CHANNEL",
+  $args = array(
+		'title' => 
+		"TOTAL METROPOLITAN AREA PREMIERES AND REPEATS BY CHANNEL",
+		'categories' => array('First Run Shows made in Metro Area',
+ 				      'Repeat Shows made in Metro Area'),
+		'pname' => 'is_show_premiere_date produced_where',
+		'pvalues' => array(1,0),
+		'cname' => 'produced_where',
+		'cvalue' => 1,
+		'gname' => 'airing_channel',
+		'gcvalues' => NULL,
+		'ggname' => NULL,
+		'ggvalue' => NULL,
+		'type' => 'count',
+		);
+
+  $ret .= cma_airing_sub_report($args, $report, $channels);
+
+  /////////////////////////////////////////////////////////////////////////
+  //RUNTIME FOR METROPOLITAN AREA PREMIERES AND REPEATS BY CHANNEL",
+  $args = array(
+		'title' => "RUNTIME FOR METROPOLITAN AREA PREMIERES AND " .
+		"REPEATS BY CHANNEL",
+		'categories' => 
+		array('Runtime for First Run made in Metro Area',
+		      'Runtime for Repeat Shows made in Metro Area'),
+		'pname' => 'is_show_premiere_date produced_where',
+		'pvalues' => array(1,0),
+		'cname' => 'produced_where',
+		'cvalue' => 1,
+		'gname' => 'airing_channel',
+		'gcvalues' => NULL,
+		'ggname' => NULL,
+		'ggvalue' => NULL,
+		'type' => 'time',
+		);
+
+  $ret .= cma_airing_sub_report($args, $report, $channels);
+
+  /////////////////////////////////////////////////////////////////////////
+  $name = "City of Portland";
+  $pname = 'is_show_premiere_date';
+  $pvalues = array(1,0);
+  $cname = 'produced_city';
+  $cvalue = 1;
+  $gname = 'airing_channel';
+  $gvalue = NULL;
+  $ggname = NULL;
+  $ggvalue = NULL;
+
+  $type = 'count';
+  $title = "TOTAL " . strtoupper($name) ." PREMIERES AND REPEATS BY CHANNEL";
+  $report_name = $pname . ' ' . $cname;
+  $categories = 
+    array('First Run Shows made in ' . $name, 'Repeat Shows made in ' . $name);
+
+  $args = 
+    array('title' => $title, 'categories' => $categories,
+	  'pname' => $report_name, 'pvalues' => $pvalues, 'cname' => $cname, 
+	  'cvalue' => $cvalue,	'gname' => $gname, 'gvalue' => $gvalue, 
+	  'ggname' => $ggname,'ggvalue' => $ggvalue, 'type' => $type);
+
+  $ret .= cma_airing_sub_report($args, $report, $channels);
+
+  $args['title'] = "RUNTIME FOR " . strtoupper($name) . 
+    " PREMIERES AND REPEATS BY CHANNEL";
+  $args['type'] = 'time';
+  $args['categories'] = array('Runtime for First Run Shows made in ' . $name,
+			      'Runtime for Repeat Shows made in ' . $name);
+
+
+  $ret .= cma_airing_sub_report($args, $report, $channels);
+
+  /////////////////////////////////////////////////////////////////////////
+  $name = "Outside of Metro Area";
+  $pname = 'is_show_premiere_date';
+  $pvalues = array(1,0);
+  $cname = 'produced_where';
+  $cvalue = 0;
+  $gname = 'airing_channel';
+  $gvalue = NULL;
+  $ggname = NULL;
+  $ggvalue = NULL;
+
+  $type = 'count';
+  $title = "TOTAL " . strtoupper($name) ." PREMIERES AND REPEATS BY CHANNEL";
+  $report_name = $pname . ' ' . $cname;
+  $categories = 
+    array('First Run Shows made in ' . $name, 'Repeat Shows made in ' . $name);
+
+  $args = 
+    array('title' => $title, 'categories' => $categories,
+	  'pname' => $report_name, 'pvalues' => $pvalues, 'cname' => $cname, 
+	  'cvalue' => $cvalue,	'gname' => $gname, 'gvalue' => $gvalue, 
+	  'ggname' => $ggname,'ggvalue' => $ggvalue, 'type' => $type);
+
+  $ret .= cma_airing_sub_report($args, $report, $channels);
+
+  $args['title'] = "RUNTIME FOR " . strtoupper($name) . 
+    " PREMIERES AND REPEATS BY CHANNEL";
+  $args['type'] = 'time';
+  $args['categories'] = array('Runtime for First Run Shows made in ' . $name,
+			      'Runtime for Repeat Shows made in ' . $name);
+
+
+  $ret .= cma_airing_sub_report($args, $report, $channels);
+
+  /////////////////////////////////////////////////////////////////////////
+  $name = "Live Sources";
+  $pname = 'is_show_premiere_date';
+  $pvalues = array(1,0);
+  $cname = 'live_source';
+  $cvalue = NULL;
+  $gname = NULL;
+  $gvalue = NULL;
+  $ggname = NULL;
+  $ggvalue = NULL;
+
+  $type = 'count';
+  $title = "TOTAL PREMIERES BY " . strtoupper($name);
+  $report_name = $pname . ' ' . $cname;
+  $categories =  array('First Run Shows');
+
+  $args = 
+    array('title' => $title, 'categories' => $categories,
+	  'pname' => $report_name, 'pvalues' => $pvalues, 'cname' => $cname, 
+	  'cvalue' => $cvalue,	'gname' => $gname, 'gvalue' => $gvalue, 
+	  'ggname' => $ggname,'ggvalue' => $ggvalue, 'type' => $type);
+  $ret .= cma_airing_sub_report($args, $report, $channels, NULL,$live_sources);
+
+  $args['title'] = "RUNTIME FOR PREMIERES BY " . strtoupper($name);
+  $args['type'] = 'time';
+  $args['categories'] = array('Runtime for First Run Shows');
+
+
+  $ret .= cma_airing_sub_report($args, $report, $channels, NULL,$live_sources);
+
+  /////////////////////////////////////////////////////////////////////////
+  $name = "Live Sources By Channel";
+  $pname = 'live_source';
+  $pvalues = array_keys($live_sources);
+  $cname = 'airing_channel';
+  $cvalue = NULL;
+  $gname = NULL;
+  $gvalue = NULL;
+  $ggname = NULL;
+  $ggvalue = NULL;
+  $categories =  $live_sources;
+
+  $type = 'count';
+  $title = "TOTAL AIRINGS FOR " . strtoupper($name);
+  $report_name = $pname . ' ' . $cname;
+
+  $args = 
+    array('title' => $title, 'categories' => $categories,
+	  'pname' => $report_name, 'pvalues' => $pvalues, 'cname' => $cname, 
+	  'cvalue' => $cvalue,	'gname' => $gname, 'gvalue' => $gvalue, 
+	  'ggname' => $ggname,'ggvalue' => $ggvalue, 'type' => $type);
+  $ret .= cma_airing_sub_report($args, $report, $channels);
+
+  $args['type'] = 'time';
+  $args['title'] = "RUNTIME FOR AIRINGS FOR " . strtoupper($name);
+
+  $ret .= cma_airing_sub_report($args, $report, $channels);
+
+  /////////////////////////////////////////////////////////////////////////
+  $name = "Live Sources In OpSig Facilities By Channel";
+  $pname = 'live_source';
+  $pvalues = array_keys($live_sources);
+  $cname = 'pcm_facilities';
+  $cvalue = 1;
+  $gname = 'airing_channel';
+  $gvalue = NULL;
+  $ggname = NULL;
+  $ggvalue = NULL;
+  $categories =  $live_sources;
+
+  $type = 'count';
+  $title = "TOTAL AIRINGS FOR " . strtoupper($name);
+  $report_name = $pname . ' ' . $cname;
+  if ($gname) {
+    $report_name .= ' ' . $gname;
+  }
+
+  $args = 
+    array('title' => $title, 'categories' => $categories,
+	  'pname' => $report_name, 'pvalues' => $pvalues, 'cname' => $cname, 
+	  'cvalue' => $cvalue,	'gname' => $gname, 'gvalue' => $gvalue, 
+	  'ggname' => $ggname,'ggvalue' => $ggvalue, 'type' => $type);
+  $ret .= cma_airing_sub_report($args, $report, $channels);
+
+  $args['type'] = 'time';
+  $args['title'] = "RUNTIME FOR AIRINGS FOR " . strtoupper($name);
+
+  $ret .= cma_airing_sub_report($args, $report, $channels);
+  
+  
+  /////////////////////////////////////////////////////////////////////////
+  $name = "Live Sources In Portland City By Channel";
+  $pname = 'live_source';
+  $pvalues = array_keys($live_sources);
+  $cname = 'produced_city';
+  $cvalue = 1;
+  $gname = 'airing_channel';
+  $gvalue = NULL;
+  $ggname = NULL;
+  $ggvalue = NULL;
+  $categories =  $live_sources;
+
+  $type = 'count';
+  $title = "TOTAL AIRINGS FOR " . strtoupper($name);
+  $report_name = $pname . ' ' . $cname;
+  if ($gname) {
+    $report_name .= ' ' . $gname;
+  }
+
+  $args = 
+    array('title' => $title, 'categories' => $categories,
+	  'pname' => $report_name, 'pvalues' => $pvalues, 'cname' => $cname, 
+	  'cvalue' => $cvalue,	'gname' => $gname, 'gvalue' => $gvalue, 
+	  'ggname' => $ggname,'ggvalue' => $ggvalue, 'type' => $type);
+  $ret .= cma_airing_sub_report($args, $report, $channels);
+
+  $args['type'] = 'time';
+  $args['title'] = "RUNTIME FOR AIRINGS FOR " . strtoupper($name);
+
+  $ret .= cma_airing_sub_report($args, $report, $channels);
+  /////////////////////////////////////////////////////////////////////////
+  $name = "Live Sources In Metro Area By Channel";
+  $pname = 'live_source';
+  $pvalues = array_keys($live_sources);
+  $cname = 'produced_where';
+  $cvalue = 1;
+  $gname = 'airing_channel';
+  $gvalue = NULL;
+  $ggname = NULL;
+  $ggvalue = NULL;
+  $categories =  $live_sources;
+
+  $type = 'count';
+  $title = "TOTAL AIRINGS FOR " . strtoupper($name);
+  $report_name = $pname . ' ' . $cname;
+  if ($gname) {
+    $report_name .= ' ' . $gname;
+  }
+
+  $args = 
+    array('title' => $title, 'categories' => $categories,
+	  'pname' => $report_name, 'pvalues' => $pvalues, 'cname' => $cname, 
+	  'cvalue' => $cvalue,	'gname' => $gname, 'gvalue' => $gvalue, 
+	  'ggname' => $ggname,'ggvalue' => $ggvalue, 'type' => $type);
+  $ret .= cma_airing_sub_report($args, $report, $channels);
+
+  $args['type'] = 'time';
+  $args['title'] = "RUNTIME FOR AIRINGS FOR " . strtoupper($name);
+
+  $ret .= cma_airing_sub_report($args, $report, $channels);
+  /////////////////////////////////////////////////////////////////////////
+  $name = "Live Sources Outside Metro Area By Channel";
+  $pname = 'live_source';
+  $pvalues = array_keys($live_sources);
+  $cname = 'produced_where';
+  $cvalue = 0;
+  $gname = 'airing_channel';
+  $gvalue = NULL;
+  $ggname = NULL;
+  $ggvalue = NULL;
+  $categories =  $live_sources;
+
+  $type = 'count';
+  $title = "TOTAL AIRINGS FOR " . strtoupper($name);
+  $report_name = $pname . ' ' . $cname;
+  if ($gname) {
+    $report_name .= ' ' . $gname;
+  }
+
+  $args = 
+    array('title' => $title, 'categories' => $categories,
+	  'pname' => $report_name, 'pvalues' => $pvalues, 'cname' => $cname, 
+	  'cvalue' => $cvalue,	'gname' => $gname, 'gvalue' => $gvalue, 
+	  'ggname' => $ggname,'ggvalue' => $ggvalue, 'type' => $type);
+  $ret .= cma_airing_sub_report($args, $report, $channels);
+
+  $args['type'] = 'time';
+  $args['title'] = "RUNTIME FOR AIRINGS FOR " . strtoupper($name);
+
+  $ret .= cma_airing_sub_report($args, $report, $channels);
+
+  /////////////////////////////////////////////////////////////////////////
+  $name = "City Council Meeting By Channel";
+  $pname = 'is_show_premiere_date';
+  $pvalues = array(1,0);
+  $cname = 'airing_channel';
+  $cvalue = 0;
+  $gname = NULL;
+  $gvalue = NULL;
+  $ggname = NULL;
+  $ggvalue = NULL;
+  $categories = 
+    array('First Run City Council Shows',
+	  'Repeat Run City Council Shows');
+
+  $type = 'count';
+  $title = "TOTAL AIRINGS FOR " . strtoupper($name);
+
+  $report_name = $pname . ' government_channel';
+
+  if ($gname) {
+    $report_name .= ' ' . $gname;
+  }
+
+  $args = 
+    array('title' => $title, 'categories' => $categories,
+	  'pname' => $report_name, 'pvalues' => $pvalues, 'cname' => $cname, 
+	  'cvalue' => $cvalue,	'gname' => $gname, 'gvalue' => $gvalue, 
+	  'ggname' => $ggname,'ggvalue' => $ggvalue, 'type' => $type);
+  $ret .= cma_airing_sub_report($args, $report, $channels);
+
+  $args['type'] = 'time';
+  $args['title'] = "RUNTIME FOR AIRINGS FOR " . strtoupper($name);
+  $args['categories'] = array('Runtime For First Run City Council Shows',
+			      'Runtime For Repeat Run City Council Shows');
+
+
+  $ret .= cma_airing_sub_report($args, $report, $channels);
+  
+  ///////////////////////////////////////////////////////////////////////
+  //dsm($report, 'Raw Data Reports');
+  return $ret;
+
+}
+
+/**
+ * Function builds a sub report table
+ */
+function cma_airing_sub_report($args, $report, $channels, $genres = NULL,
+			       $live_sources = NULL) {
+  $type = $args['type'];
+  $pname = $args['pname'];//name of parent, or highest level
+  $cname = $args['cname'];//name of child, or second highest level
+  $gname = $args['gname'];//name of grandchild, or third highest level
+  $ggname = $args['ggname'];//name of great-grandchild, or the lowest level
+  $cvalue = $args['cvalue'];
+  $gvalue = $args['gvalue'];
+  $ggvalue = $args['ggvalue'];
+
+  $ret = "<H2>" . $args['title'] . "</H2>";
+  $ret .= "<table><tr><th>Category</th>";
+
+  if ($genres) {
+    $columns = $genres;
+  }
+  else if ($live_sources) {
+    $columns = $live_sources;
+  }
+  else {
+    $columns = $channels;
+  }
+  foreach ($columns as $id => $name) {
+    $ret .= "<th>".$name."</th>";
+  }
+  $ret .= "<th>Total</th>";
+  $ret .= "</tr>";
+
+  $index = 0;
+  $column_total = array();
+  //LOOP OVER TEH CATEGORIES OUTPUTTING A SINGLE ROW FOR EACH
+  foreach ($args['categories'] as $category) {
+    $pvalue = $args['pvalues'][$index];
+    $index ++;
+    $ret .= "<tr><td>".$category."</td>";
+
+    //ITERATE OVER EACH COLUMN, OUTPUTTING A SINGLE AMOUNT FOR EACH
+    $total = 0;
+
+    foreach ($columns as $id => $name) {
+      $column_total[$id] = isset($column_total[$id]) ? $column_total[$id] :
+	0;
+      if ($ggname) {
+	$amount = $report[$pname][$pvalue][$cname][$cvalue][$gname][$gvalue]
+	  [$ggname][$id][$type];
+      }
+      else if ($gname) {
+	$amount = $report[$pname][$pvalue][$cname][$cvalue][$gname][$id]
+	  [$type];
+      }
+      else if ($cname) {
+	$amount = $report[$pname][$pvalue][$cname][$id][$type];
+      }
+      $amount = $amount ? $amount : 0;
+      $total += $amount;
+      $column_total[$id] += $amount;
+      $amount = ($type == 'time') ? cma_airing_report_hms($amount) : $amount;
+      $ret .= "<td>" . $amount . "</td>";      
+    }
+
+    $total = ($type == 'time') ? cma_airing_report_hms($total) : $total;
+    $ret .= "<td>". $total . "</td></tr>";
+  }
+
+  $ret .= "<tr><td><strong>Totals</strong></td>";
+  $total = 0;
+  foreach ($columns as $id => $name) {
+    $amount = $column_total[$id];
+    $amount = $amount ? $amount : 0;
+    $total += $amount;
+    $amount = ($type == 'time') ? cma_airing_report_hms($amount) : $amount;
+    
+    $ret .= "<td>".$amount."</td>";
+  }
+  $total = $total ? $total : 0;
+  $total = ($type == 'time') ? cma_airing_report_hms($total) : $total;
+  $ret .= "<td>".$total."</td>";
+  $ret .= "</tr></table>";
+
+  return $ret;
+}
+/**
+ * Function returns hours minutes seconds for unixtimestamps
+ */
+function cma_airing_report_hms($seconds) {
+  if (!$seconds) {
+    return '00:00:00';
+  }
+  $hours = floor($seconds / 3600);
+  $minutes = floor(($seconds / 60) % 60);
+  $seconds = $seconds % 60;
+
+  if ($seconds < 10) {
+    $seconds = '0'.$seconds;
+  }
+  if ($minutes < 10) {
+    $minutes = '0'.$minutes;
+  }
+
+  return "$hours:$minutes:$seconds";
+}
+
+
+/**
+ * Implementation of hook_action_info().
+ */
+function cma_airing_report_action_info() {
+  
+  $action = 
+    array(
+	  'cma_airing_report_resave_show_nodes' => 
+	  array(
+		'label' => t("Update runtimes for the Airing's Show"),
+		'type' => 'airing',
+		'configurable' => FALSE,
+		'triggers' => array('any'),
+		'behavior' => array('delete_property'),
+		),      
+
+	  );
+  
+  return $action;
+}
+
+/**
+ *Bulk operations action for updating the Airing's Show's runtime
+ */
+function cma_airing_report_resave_show_nodes(&$airing, 
+					     $context = array()) {
+  global $count;
+  global $shows;
+
+  $count = isset($count) ? $count : 0;
+  $shows = isset($shows) ? $shows : array();
+  $count ++;
+
+  $show_nid = cma_airing_report_get_single_field_value($airing,
+						       'field_airing_show_ref',
+						       'target_id');
+
+  if (!$shows[$show_nid]) {
+    $shows[$show_nid] = $show_nid;
+    $show = node_load($show_nid);
+
+    //fetch the cc show to see if there is a runtime over there
+    $cc_show_id = 
+      cma_airing_report_get_single_field_value($show,
+					       'field_cablecast_show_id',
+					       'value');
+
+    $cc_show = $cc_show_id ?
+      cablecast_api_server_query('GetShowInformation',
+				 array('ShowID'=>
+				       $cc_show_id)) : NULL;
+    
+    $cc_show = ($cc_show && isset($cc_show->GetShowInformationResult)) ?
+      $cc_show->GetShowInformationResult : NULL;
+    
+    $runtime = $cc_show ? $cc_show->TotalSeconds : 0;
+    if ($runtime) {
+      $show->field_runtime[LANGUAGE_NONE][0]['value'] = $runtime;
+      node_save($show);
+    }
+  }
+  
+}
+
+
+/**
+ * Helper function to get a single value off of a entity
+ */
+function cma_airing_report_get_single_field_value($entity, $field_name, 
+						  $index = 'value') {
+  if (isset($entity->{$field_name})) {
+    $field = $entity->{$field_name};
+    if (isset($field[LANGUAGE_NONE]) && 
+	isset($field[LANGUAGE_NONE][0]) &&
+	isset($field[LANGUAGE_NONE][0][$index])) {
+      return $field[LANGUAGE_NONE][0][$index];
+    }
+  }
+  return NULL;
+}
